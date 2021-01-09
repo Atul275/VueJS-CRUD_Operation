@@ -1,0 +1,40 @@
+{
+  "employees": [
+    {
+      "id": 101,
+      "name": "Atul",
+      "salary": 15000,
+      "age": 25
+    },
+    {
+      "id": 102,
+      "name": "Ankit",
+      "salary": 10000,
+      "age": 20
+    },
+    {
+      "id": 103,
+      "name": "Ram",
+      "salary": 11000,
+      "age": 21
+    },
+    {
+      "id": 104,
+      "name": "Urmila",
+      "salary": 12000,
+      "age": 30
+    },
+    {
+      "id": 105,
+      "name": "Jiteshwari",
+      "salary": 15000,
+      "age": 24
+    },
+    {
+      "id": "106",
+      "name": "Shyam",
+      "salary": "12000",
+      "age": "25"
+    }
+  ]
+}
