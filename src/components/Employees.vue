@@ -7,6 +7,13 @@
               </div>
           </div>
       </div>
+      <div class="container mt-2">
+          <div class="row">
+              <div class="col-lg-12">
+                  <input type="text" v-model="search" placeholder="Search..."  />
+              </div>
+          </div>
+      </div>
       <div class="container">
           <div class="row mt-3">
               <div class="col-lg-6">
@@ -14,7 +21,7 @@
               </div>
               <div class="col-lg-6">
                   <button class="btn btn-success float-right" title="Add" @click="showAddModal=true">
-                      <i class="fa fa-user-alt"></i>&nbsp;&nbsp;Add User
+                      <i class="fa fa-user-plus"></i>&nbsp;&nbsp;Add
                   </button>
               </div>
           </div>
@@ -40,7 +47,7 @@
                           </tr>
                       </thead>
                       <tbody>
-                          <tr v-for="(emp, idx) in employees" v-bind:key="idx">
+                          <tr v-for="(emp, idx) in resultQuery" v-bind:key="idx">
                               <td>{{emp.id}}</td>
                               <td class="text-left">{{emp.name}}</td>
                               <td>{{emp.salary}}</td>
@@ -173,7 +180,19 @@ export default {
         showDeleteModal: false,
         employees: [],
         newEmployees: {id: null, name: null, salary: null, age: null},
-        currentEmployees: {id: null, name: null, salary: null, age: null}
+        currentEmployees: {id: null, name: null, salary: null, age: null},
+        search: '',
+    }
+  },
+  computed: {
+    resultQuery(){
+        if(this.search){
+            return this.employees.filter((sEmp)=>{
+                return this.search.toLowerCase().split(' ').every(v => sEmp.name.toLowerCase().includes(v))
+            })
+        }else{
+            return this.employees;
+        }
     }
   },
   mounted: function() {
