@@ -39,7 +39,7 @@
                   <table class="table table-bordered table-hover">
                       <thead>
                           <tr class="bg-info text-light">
-                              <th @click= "orderBy('id')">Id</th>
+                              <th>Id</th>
                               <th>Name</th>
                               <th>Salary</th>
                               <th>Age</th>
@@ -208,7 +208,7 @@ export default {
             }
         })
       },
-      
+
       addEmployee() {
           var formData = {
             id: this.newEmployees.id,

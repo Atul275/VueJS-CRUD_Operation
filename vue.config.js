@@ -1,6 +1,6 @@
 // vue.config.js backend API configuration
 module.exports = {
-    runtimeCompiler: true, 
+    runtimeCompiler: true,
     devServer: {
         compress: true,
         proxy: 'http://localhost:6060/',
