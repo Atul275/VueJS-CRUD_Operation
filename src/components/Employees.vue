@@ -39,7 +39,7 @@
                   <table class="table table-bordered table-hover">
                       <thead>
                           <tr class="bg-info text-light">
-                              <th>Id</th>
+                              <th @click= "orderBy('id')">Id</th>
                               <th>Name</th>
                               <th>Salary</th>
                               <th>Age</th>
@@ -47,7 +47,7 @@
                           </tr>
                       </thead>
                       <tbody>
-                          <tr v-for="(emp, idx) in resultQuery" v-bind:key="idx">
+                          <tr v-for="(emp, idx) in resultQuery " v-bind:key="idx">
                               <td>{{emp.id}}</td>
                               <td class="text-left">{{emp.name}}</td>
                               <td>{{emp.salary}}</td>
@@ -188,7 +188,7 @@ export default {
     resultQuery(){
         if(this.search){
             return this.employees.filter((sEmp)=>{
-                return this.search.toLowerCase().split(' ').every(v => sEmp.name.toLowerCase().includes(v))
+                return this.search.toLowerCase().split(' ').every(v => sEmp.name.toLowerCase().includes(v)).orderBy(this.sEmp, 'id')
             })
         }else{
             return this.employees;
@@ -200,7 +200,7 @@ export default {
   },
   methods: {
       getAllEmployees() {
-        axios.get("http://localhost:8081/api/employees/fetch").then(resp =>{
+        axios.get("http://localhost:9999/api/employees/fetch").then(resp =>{
             if(resp.data.error) {
                 this.errorMsg =resp.data.message;
             }  else {    
@@ -208,6 +208,7 @@ export default {
             }
         })
       },
+      
       addEmployee() {
           var formData = {
             id: this.newEmployees.id,
@@ -215,7 +216,7 @@ export default {
             salary: this.newEmployees.salary, 
             age: this.newEmployees.age
           };
-          axios.post("http://localhost:8081/api/employees/add", formData).then(req =>{
+          axios.post("http://localhost:9999/api/employees/add", formData).then(req =>{
             if(req.data.error) {
                 this.errorMsg =req.data.message;
             }  else {  
@@ -234,7 +235,7 @@ export default {
             salary: updateEmp.salary, 
             age: updateEmp.age
           };
-          axios.put("http://localhost:8081/api/employees/update/" +formData.id, formData).then(req =>{
+          axios.put("http://localhost:9999/api/employees/update/" +formData.id, formData).then(req =>{
             if(req.data.error) {
                 this.errorMsg =req.data.message;
             }  else {  
@@ -253,7 +254,7 @@ export default {
             salary: delEmp.salary, 
             age: delEmp.age
           };
-          axios.delete("http://localhost:8081/api/employees/delete/" + formData.id).then((del) => {
+          axios.delete("http://localhost:9999/api/employees/delete/" + formData.id).then((del) => {
             if(del.data.error) {
                 this.errorMsg = del.data.message;
             }  else {  
