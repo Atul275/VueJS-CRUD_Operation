@@ -1,16 +1,17 @@
 <template>
   <div id="app">
-    <Employees />
+    <AppHead class="text-success ml-5"/>
+    <router-view />
   </div>
 </template>
 
 <script>
-  import Employees from './components/Employees'
+  import AppHead from "./components/AppHeader";
 
   export default {
     name: 'App',
     components: {
-      Employees
+      AppHead,
     }
   }
 </script>
