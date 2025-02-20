@@ -9,29 +9,36 @@
       </div>
     </div>
 
-    <div class="container mt-2">
-      <div class="row">
-        <div class="col-lg-12">
-          <input type="text" v-model="search" placeholder="Search..."  />
-        </div>
-      </div>
-    </div>
-      
     <div class="container">
-      <div class="row mt-3">
-        <div class="col-lg-6">
-          <h4 class="text-info"><i class="fa fa-list aln-t"></i>&nbsp;&nbsp;User List</h4>
-        </div>
-        <div class="col-lg-2">
-          <button class="btn btn-primary float-center" title="Dowload Data" @click="downloadAllData">
-            <i class="fas fa-download" aria-hidden="true"></i>
-          </button>
-        </div>
-        <div class="col-lg-4">
-          <button class="btn btn-success float-right" title="Add" @click="showAddModal=true">
-            <i class="fa fa-user-plus"></i>&nbsp;&nbsp;Add
-          </button>
-        </div>
+      <div class="row mt-3" style="width: 100%;">
+        <table style="width: 100%;">
+          <tr style="width: 100%;">
+            <td style="width: 15%;">
+              <div class="ml-3 float-left">
+                <h4 class="text-info"><i class="fa fa-list aln-t"></i>&nbsp;&nbsp;User List</h4>
+              </div>
+            </td>
+            <td style="width: 35%;">
+              <div class="ml-5 float-center" style="width: 95%;">
+                <input type="text" v-model="search" placeholder="Search..." style="width: 75%;" />
+              </div>
+            </td>
+            <td style="width: 10%;">
+              <div class="mr-1 float-center">
+                <button class="btn btn-primary float-right" title="Dowload" @click="downloadAllData">
+                  <i class="fas fa-download" aria-hidden="true"></i>
+                </button>
+              </div>
+            </td>
+            <td style="width: 5%;">
+              <div class="">
+                <button class="btn btn-success float-left" title="Add" @click="showAddModal=true">
+                  <i class="fa fa-user-plus"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </table>
       </div>
       <hr class="bg-info">
       <div class="alert alert-danger" v-if="errorMsg">
@@ -43,16 +50,16 @@
           
       <!-- Dispay All Users Record -->
       <div class="row">
-        <div class="col-lg-12">
-          <table class="table table-bordered table-hover">
-            <thead>
+        <div class="col-lg-12" style="min-height: 100px; max-height:450px; overflow:auto;">
+          <table class="table table-bordered table-hover" v-columns-resizable>
+            <thead style="position: sticky; top: 0;">
               <tr class="bg-info text-light">
                 <th  v-for="(theadData, idx) in theadData" v-bind:key="idx">{{theadData}}</th>
                 <th colspan="3">Action</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(emp, idx) in resultQuery" v-bind:key="idx">
+              <tr v-for="(emp, idx) in searchData" v-bind:key="idx">
                 <td class="text-right">{{emp.id}}</td>
                 <td class="text-left">{{emp.name}}</td>
                 <td class="text-right">{{emp.salary}}</td>
@@ -71,7 +78,7 @@
                 </td>
                 <td>
                   <button class="text-success" title="view scanner" @click="showQModal=true; viewQRCode(emp)">
-                    <i class="fa fa-info-square" aria-hidden="true"></i>
+                    <i class="fa fa-eye" aria-hidden="true"></i>
                   </button>
                 </td>
               </tr>
@@ -97,10 +104,6 @@
           
           <div class="modal-body p-4">
             <form action="#" method="post">
-              <div class="form-group">
-                <input type="text" @keypress="onlyNumbers" name="id" v-model="maxId1" placeholder="Id(only numeric)" 
-                  class="form-control form-control-lg" required/>
-              </div>
               <div class="form-group">
                 <input type="text" @input="nameValidation" name="name" v-model="name" placeholder="Name" 
                   class="form-control form-control-lg" required/>
@@ -234,7 +237,7 @@
             <h5 class="bg-info text-light">{{currentEmployees.name}}, Please Scan QR Code to See your Details</h5>
             <qrcode-vue :value="qrValue" :size="qrSize" level="H" />
             <button class="text-info btn-lg" title="user info" @click="showViewModal=true; getEmployeesById()">
-              <i class="fa fa-info-square" aria-hidden="true"></i>
+              <i class="fa fa-eye" aria-hidden="true"></i>
             </button>
           </div>
         </div>
@@ -274,242 +277,241 @@
 </template>
 
 <script>
-import axios from 'axios';
-import QrcodeVue from 'qrcode.vue';
+  import axios from 'axios';
+  import QrcodeVue from 'qrcode.vue';
 
-export default {
-  name: 'Employees',
-  data () {
-    return {
-        theadData: ["Id", "Name", "Salary", "Age", "Mobile", "Email"],
-        id: null,
-        name: null,
-        salary: null,
-        age: null,
-        mobile: null,
-        email: null,
-        address: null,
-        gender:null,
-        errorMsg: "",
-        successMsg: "",
-        validName: false,
-        validAge: false,
-        validMobile: false,
-        validEmail: false,
-        showAddModal: false,
-        showEditModal: false,
-        showDeleteModal: false,
-        showViewModal: false,
-        showQModal: false,
-        isDisabled: true,
-        employees: [],
-        maxId:[],
-        maxId1:"",
-        search: '',
-        currentEmployees: {id: null, name: null, salary: null, age: null, mobile: null, email: null, address: null, gender: null},
-        qrValue: null,
-        excelData: null,
-        qrSize: 200,
-        regEmail: /^(([^<>()\]\\.,;:\s@"]+(\.[^<>()\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/ ,
-        regName: /^[A-z]*$|^[A-z]+\s[A-z]*$/ ,
-    }
-  },
-  components: {
+  export default {
+    name: 'Employees',
+    data () {
+      return {
+          theadData: ["Id", "Name", "Salary", "Age", "Mobile", "Email"],
+          id: null,
+          name: null,
+          salary: null,
+          age: null,
+          mobile: null,
+          email: null,
+          address: null,
+          gender:"Male",
+          errorMsg: "",
+          successMsg: "",
+          validName: false,
+          validAge: false,
+          validMobile: false,
+          validEmail: false,
+          showAddModal: false,
+          showEditModal: false,
+          showDeleteModal: false,
+          showViewModal: false,
+          showQModal: false,
+          isDisabled: true,
+          employees: [],
+          maxId:[],
+          maxId1:"",
+          search: '',
+          currentEmployees: {id: null, name: null, salary: null, age: null, mobile: null, email: null, address: null, gender: null},
+          qrValue: null,
+          excelData: null,
+          qrSize: 200,
+          regEmail: /^(([^<>()\]\\.,;:\s@"]+(\.[^<>()\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/ ,
+          regName: /^[A-z]*$|^[A-z]+\s[A-z]*$/ ,
+      }
+    },
+    components: {
       QrcodeVue,
     },
-  computed: {
-    resultQuery(){
-        if(this.search){
-            return this.employees.filter((sEmp)=>{
-                return this.search.toLowerCase()
-                .split(' ').every(v => sEmp.name.toLowerCase().includes(v))
-            })
-        }else{
-            return this.employees;
-        }
-    }
-  },
-  mounted: function() {
-      this.getAllEmployees();
-      this.getMaxId();
-  },
-  methods: {
-        onlyNumbers(event) {
-               let keyCode = event.keyCode ? event.keyCode : event.which;
-               if (keyCode < 48 || keyCode > 57) {
-                 event.preventDefault();
-               }
-        },
-        nameValidation() {
-            if ((this.regName.test(this.name)) && this.name.length> 3) {
-                this.validName= false
-                this.isDisabled= false
-            }  else {
-                this.validName= true
-                this.isDisabled= true
-            }
-        },
-        ageValidation() {
-            if ((this.age> 10 && this.age< 90) || (this.currentEmployees.age> 10 && this.currentEmployees.age< 90)) {
-                this.validAge= false
-            }  else {
-                this.validAge= true
-            }
-        },
-        mobileValidation() {
-            if (this.mobile.length === 10 || this.mobile.length === 0) {
-                this.validMobile= false
-            }  else {
-                this.validMobile= true
-            }
-            console.log("validMobile", this.validMobile)
-        },
-        checkEmail() {
-            if (this.regEmail.test(this.email) || this.email.length === 0 || this.regEmail.test(this.currentEmployees.email)) {
-                this.validEmail = false
-            }
-            else {
-                this.validEmail = true
-            }
-            console.log("validEmail", this.validEmail)
-        },
+    computed: {
+      searchData(){
+          if(this.search){
+              return this.employees.filter((sEmp)=>{
+                  return this.search.toLowerCase()
+                    .split(' ').every(v => sEmp.name.toLowerCase().includes(v))
+              })
+          }else{
+              return this.employees;
+          }
+      }
+    },
+    mounted: function() {
+        this.getAllEmployees();
+        this.getMaxId();
+    },
+    methods: {
+          onlyNumbers(event) {
+                let keyCode = event.keyCode ? event.keyCode : event.which;
+                if (keyCode < 48 || keyCode > 57) {
+                  event.preventDefault();
+                }
+          },
+          nameValidation() {
+              if ((this.regName.test(this.name)) && this.name.length> 3) {
+                  this.validName= false
+                  this.isDisabled= false
+              }  else {
+                  this.validName= true
+                  this.isDisabled= true
+              }
+          },
+          ageValidation() {
+              if ((this.age> 10 && this.age< 90) || (this.currentEmployees.age> 10 && this.currentEmployees.age< 90)) {
+                  this.validAge= false
+              }  else {
+                  this.validAge= true
+              }
+          },
+          mobileValidation() {
+              if (this.mobile.length === 10 || this.mobile.length === 0) {
+                  this.validMobile= false
+              }  else {
+                  this.validMobile= true
+              }
+              console.log("validMobile", this.validMobile)
+          },
+          checkEmail() {
+              if (this.regEmail.test(this.email) || this.email.length === 0 || this.regEmail.test(this.currentEmployees.email)) {
+                  this.validEmail = false
+              }
+              else {
+                  this.validEmail = true
+              }
+              console.log("validEmail", this.validEmail)
+          },
 
-        getEmployeesById() {
-            let getEmp = this.currentEmployees;
-            this.showQModal=false;
-            var formData = {
-                id: getEmp.id,
-                name: getEmp.name,
-                salary: getEmp.salary, 
-                age: getEmp.age,
-                mobile: getEmp.mobile,
-                email: getEmp.email,
-                address: getEmp.address,
-                gender: getEmp.gender,
-            };
-            axios.get("http://localhost:9999/api/employees/" +formData.id).then(resp =>{
-                if(resp.data.error) {
-                    this.errorMsg =resp.data.message;
-                }  else {    
-                    this.employees = resp.data
-                    console.log("emp:", this.employees)
-                    this.getAllEmployees();
-                }
-            })
-        },
-        getMaxId() {
-            axios.get("http://localhost:9999/api/employees/maxid").then(resp =>{
-                if(resp.data.error) {
-                    this.errorMsg =resp.data.message;
-                }  else {    
-                    this.maxId = resp.data;
-                    this.maxId1= this.maxId.id+1;
-                }
-            })
-        },
-        getAllEmployees() {
-            axios.get("http://localhost:9999/api/employees/fetch").then(resp =>{
-                if(resp.data.error) {
-                    this.errorMsg =resp.data.message;
-                }  else {    
-                    this.employees = resp.data
-                }
-            })
-        },
-        addEmployee() {
-            var formData = {
-                id: this.maxId1,
-                name: this.name,
-                salary: this.salary, 
-                age: this.age,
-                mobile: this.mobile,
-                email: this.email,
-                address: this.address,
-                gender: this.gender
-            };
-            axios.post("http://localhost:9999/api/employees/add", formData).then(req =>{
-                if(req.data.error) {
-                    this.errorMsg =req.data.message;
-                }  else {  
-                    this.successMsg =req.data.message;
-                    this.id= this.id+1;
-                    this.name='';
-                    this.salary='';
-                    this.age='';
-                    this.mobile='';
-                    this.email='';
-                    this.address='';
-                    this.isDisabled= true
-                    console.log("Data submited: ", this.name);
-                    this.getAllEmployees();
-                }
-            })
-        },
-        updateEmployee() {
-            console.log("update", this.currentEmployees)
-            let updateEmp = this.currentEmployees;
-            var formData = {
-                id: updateEmp.id,
-                name: updateEmp.name,
-                salary: updateEmp.salary, 
-                age: updateEmp.age,
-                mobile: updateEmp.mobile,
-                email: updateEmp.email,
-                address: updateEmp.address,
-                gender: updateEmp.gender
-            };
-            axios.put("http://localhost:9999/api/employees/update/" +formData.id, formData).then(req =>{
-                if(req.data.error) {
-                    this.errorMsg =req.data.message;
-                }  else {  
-                    this.successMsg =req.data.message;
-                    console.log("Data updated: ", updateEmp.id, updateEmp.name, updateEmp.salary, updateEmp.age, updateEmp.mobile, updateEmp.email, updateEmp.address);
-                    this.getAllEmployees();
-                }
-            })
-        },
-        deleteEmpmployee() {
-            console.log("delete", this.currentEmployees)
-            let delEmp = this.currentEmployees;
-            var formData = {
-                id: delEmp.id,
-                name: delEmp.name,
-                salary: delEmp.salary, 
-                age: delEmp.age,
-                mobile: delEmp.mobile,
-                email: delEmp.email,
-                address: delEmp.address,
-                gender: delEmp.gender,
-            };
-            axios.delete("http://localhost:9999/api/employees/delete/" + formData.id).then((del) => {
-                if(del.data.error) {
-                    this.errorMsg = del.data.message;
-                }  else {  
-                    this.successMsg = del.data.message;
-                    console.log("Data deleted: ", delEmp.id);
-                    this.getAllEmployees();
-                }
-            });
-        },
-        viewQRCode(employees) {
-            this.currentEmployees = employees
-            let qrGen= employees;
-            this.qrValue=JSON.stringify({Name:qrGen.name, Salary:qrGen.salary, Age: qrGen.age, Mobile: qrGen.mobile, Email: qrGen.email});
-            console.log("QR Values:", this.qrValue)
-        },
-        selectEmployee(employees) {
-            this.currentEmployees = employees
-            let qrGen= this.currentEmployees;
-            this.qrValue=JSON.stringify({Name:qrGen.name, Salary:qrGen.salary, Age: qrGen.age, Mobile: qrGen.mobile, Email: qrGen.email});
-            console.log("cutrrr", this.currentEmployees)
-        },
-        downloadAllData() {
-            const url= "http://localhost:6060/api/employees/download"
-            window.location.href = url;
-            
-        }
-    }
-}
+          getEmployeesById() {
+              let getEmp = this.currentEmployees;
+              this.showQModal=false;
+              var formData = {
+                  id: getEmp.id,
+                  name: getEmp.name,
+                  salary: getEmp.salary, 
+                  age: getEmp.age,
+                  mobile: getEmp.mobile,
+                  email: getEmp.email,
+                  address: getEmp.address,
+                  gender: getEmp.gender,
+              };
+              axios.get("http://localhost:9999/api/employees/" +formData.id).then(resp =>{
+                  if(resp.data.error) {
+                      this.errorMsg =resp.data.message;
+                  }  else {    
+                      this.employees = resp.data
+                      console.log("emp:", this.employees)
+                      this.getAllEmployees();
+                  }
+              })
+          },
+          getMaxId() {
+              axios.get("http://localhost:9999/api/employees/maxid").then(resp =>{
+                  if(resp.data.error) {
+                      this.errorMsg =resp.data.message;
+                  }  else {    
+                      this.maxId = resp.data;
+                      this.maxId1= this.maxId.id+1;
+                  }
+              })
+          },
+          getAllEmployees() {
+              axios.get("http://localhost:9999/api/employees/fetch").then(resp =>{
+                  if(resp.data.error) {
+                      this.errorMsg =resp.data.message;
+                  }  else {    
+                      this.employees = resp.data
+                  }
+              })
+          },
+          addEmployee() {
+              var formData = {
+                  //id: this.maxId1,
+                  name: this.name,
+                  salary: this.salary, 
+                  age: this.age,
+                  mobile: this.mobile,
+                  email: this.email,
+                  address: this.address,
+                  gender: this.gender
+              };
+              axios.post("http://localhost:9999/api/employees/add", formData).then(req =>{
+                  if(req.data.error) {
+                      this.errorMsg =req.data.message;
+                  }  else {  
+                      this.successMsg =req.data.message;
+                      this.name='';
+                      this.salary='';
+                      this.age='';
+                      this.mobile='';
+                      this.email='';
+                      this.address='';
+                      this.isDisabled= true
+                      console.log("Data submited: ", this.name);
+                      this.getAllEmployees();
+                  }
+              })
+          },
+          updateEmployee() {
+              console.log("update", this.currentEmployees)
+              let updateEmp = this.currentEmployees;
+              var formData = {
+                  id: updateEmp.id,
+                  name: updateEmp.name,
+                  salary: updateEmp.salary, 
+                  age: updateEmp.age,
+                  mobile: updateEmp.mobile,
+                  email: updateEmp.email,
+                  address: updateEmp.address,
+                  gender: updateEmp.gender
+              };
+              axios.put("http://localhost:9999/api/employees/update/" +formData.id, formData).then(req =>{
+                  if(req.data.error) {
+                      this.errorMsg =req.data.message;
+                  }  else {  
+                      this.successMsg =req.data.message;
+                      console.log("Data updated: ", updateEmp.id, updateEmp.name, updateEmp.salary, updateEmp.age, updateEmp.mobile, updateEmp.email, updateEmp.address);
+                      this.getAllEmployees();
+                  }
+              })
+          },
+          deleteEmpmployee() {
+              console.log("delete", this.currentEmployees)
+              let delEmp = this.currentEmployees;
+              var formData = {
+                  id: delEmp.id,
+                  name: delEmp.name,
+                  salary: delEmp.salary, 
+                  age: delEmp.age,
+                  mobile: delEmp.mobile,
+                  email: delEmp.email,
+                  address: delEmp.address,
+                  gender: delEmp.gender,
+              };
+              axios.delete("http://localhost:9999/api/employees/delete/" + formData.id).then((del) => {
+                  if(del.data.error) {
+                      this.errorMsg = del.data.message;
+                  }  else {  
+                      this.successMsg = del.data.message;
+                      console.log("Data deleted: ", delEmp.id);
+                      this.getAllEmployees();
+                  }
+              });
+          },
+          viewQRCode(employees) {
+              this.currentEmployees = employees
+              let qrGen= employees;
+              this.qrValue=JSON.stringify({Name:qrGen.name, Salary:qrGen.salary, Age: qrGen.age, Mobile: qrGen.mobile, Email: qrGen.email});
+              console.log("QR Values:", this.qrValue)
+          },
+          selectEmployee(employees) {
+              this.currentEmployees = employees
+              let qrGen= this.currentEmployees;
+              this.qrValue=JSON.stringify({Name:qrGen.name, Salary:qrGen.salary, Age: qrGen.age, Mobile: qrGen.mobile, Email: qrGen.email});
+              console.log("cutrrr", this.currentEmployees)
+          },
+          downloadAllData() {
+              const url= "http://localhost:6060/api/employees/download"
+              window.location.href = url;
+              
+          }
+      }
+  }
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>

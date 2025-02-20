@@ -23,7 +23,7 @@
           <h4 class="text-info"><i class="fa fa-list aln-t"></i>&nbsp;&nbsp;User List</h4>
         </div>
         <div class="col-lg-2">
-          <button class="btn btn-primary float-center" title="Dowload Data" @click="downloadAllData">
+          <button class="btn btn-primary float-center" title="Dowload" @click="downloadAllData">
             <i class="fas fa-download" aria-hidden="true"></i>
           </button>
         </div>
@@ -44,10 +44,10 @@
       <!-- Dispay All Users Record -->
       <div class="row">
         <div class="col-lg-12">
-          <table class="table table-bordered table-hover">
+          <table class="table table-bordered table-hover" v-columns-resizable>
             <thead>
               <tr class="bg-info text-light">
-                <th  v-for="(theadData, idx) in theadData" v-bind:key="idx">{{theadData}}</th>
+                <th v-for="(theadData, idx) in theadData" v-bind:key="idx">{{theadData}}</th>
                 <th colspan="3">Action</th>
               </tr>
             </thead>
@@ -70,8 +70,8 @@
                   </button>
                 </td>
                 <td>
-                  <button class="text-success" title="view scanner" @click="showQModal=true; viewQRCode(emp)">
-                    <i class="fa fa-info-square" aria-hidden="true"></i>
+                  <button class="text-success" title="view" @click="showQModal=true; viewQRCode(emp)">
+                    <i class="fa fa-eye" aria-hidden="true"></i>
                   </button>
                 </td>
               </tr>
@@ -97,10 +97,10 @@
           
           <div class="modal-body p-4">
             <form action="#" method="post">
-              <div class="form-group">
+              <!--<div class="form-group">
                 <input type="text" @keypress="onlyNumbers" name="id" v-model="maxId1" placeholder="Id(only numeric)" 
                   class="form-control form-control-lg" required/>
-              </div>
+              </div>-->
               <div class="form-group">
                 <input type="text" @input="nameValidation" name="name" v-model="name" placeholder="Name" 
                   class="form-control form-control-lg" required/>
@@ -233,8 +233,8 @@
           <div class="modal-body p-2">
             <h5 class="bg-info text-light">{{currentEmployees.name}}, Please Scan QR Code to See your Details</h5>
             <qrcode-vue :value="qrValue" :size="qrSize" level="H" />
-            <button class="text-info btn-lg" title="user info" @click="showViewModal=true; getEmployeesById()">
-              <i class="fa fa-info-square" aria-hidden="true"></i>
+            <button class="text-info btn-lg" title="info" @click="showViewModal=true; getEmployeesById()">
+              <i class="fa fa-eye" aria-hidden="true"></i>
             </button>
           </div>
         </div>
@@ -289,7 +289,7 @@ export default {
         mobile: null,
         email: null,
         address: null,
-        gender:null,
+        gender:"Male",
         errorMsg: "",
         successMsg: "",
         validName: false,

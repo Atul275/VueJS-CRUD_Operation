@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <AppHead class="text-success ml-5"/>
+    <AppHead class="text-success"/>
     <router-view />
   </div>
 </template>
