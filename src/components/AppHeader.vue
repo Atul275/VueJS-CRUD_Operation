@@ -13,8 +13,8 @@ export default {
   data() {
     return {
       paths: [
-      { title: 'Login', to: '/',},
-        { title: 'Home', to: '/home',},
+        { title: 'Login', to: '/'},
+        { title: 'Home', to: '/home'},
         { title: 'View', to: '/view'},
         { title: 'Employees', to: '/employees'},
       ]
@@ -22,3 +22,5 @@ export default {
   },
 };
 </script>
+<style scoped>
+</style>
