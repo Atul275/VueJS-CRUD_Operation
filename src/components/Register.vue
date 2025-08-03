@@ -34,6 +34,7 @@
               </button>
             </div>
           </form>
+          <router-link to="/">Go to Login</router-link>
         </div>
       </div>
     </div>

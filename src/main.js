@@ -17,7 +17,7 @@ import Login from './components/Login'
 import Success from '@/components/Success';
 import Error from '@/components/Error';
 import Register from './components/Register'
-
+import Logout from './components/Logout.vue';
 
 Vue.config.productionTip = false
 Vue.use(VueAxios, axios)
@@ -27,6 +27,11 @@ const routes = [
   {
     path: '/',
     component: Login
+  },
+  {
+    path: '/logout',
+    name: 'Logout',
+    component: Logout,
   },
   {
     path: '/success/:username',
